@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Counter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<!--<body>-->
+<!--<h1>WebSocket Counter</h1>-->
+<!--<p>Received Message: <span id="message"></span></p>-->
+<!--<button onclick="sendMessage()">Send</button>-->
+<!--<script>-->
+<!--    let stompClient = null;-->
+
+<!--    const socket = new SockJS('/ws'); // Ensure that '/ws' matches your server's WebSocket endpoint-->
+<!--    stompClient = Stomp.over(socket);-->
+<!--    stompClient.connect({}, function(frame) {-->
+<!--        console.log(frame);-->
+<!--        stompClient.subscribe('/all/messages', function(result) {-->
+<!--            const message = JSON.parse(result.body);-->
+<!--            // Update the inner text of the message element-->
+<!--            const messageElement = document.getElementById('message');-->
+<!--            if (messageElement) {-->
+<!--                messageElement.innerText = message.text;-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
+<!--    function sendMessage() {-->
+<!--        const text = "This is a hard-coded message."; // Modify this line with your desired message-->
+<!--        stompClient.send('/app/application', {}, JSON.stringify({ from: 'from', text: text }));-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<body>
+<h1>WebSocket Counter</h1>
+<p>Counter Value: <span id="counter">0</span></p>
+<button onclick="incrementCounter()">Increment</button>
+<script>
+    let stompClient = null;
+
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function(frame) {
+        console.log('Connected to WebSocket:', frame);
+        stompClient.subscribe('/topic/counter', function(result) {
+            const counterValue = parseInt(result.body);
+            console.log('Received counter update:', counterValue);
+            const counterElement = document.getElementById('counter');
+            if (counterElement) {
+                counterElement.innerText = counterValue;
+            }
+        });
+    });
+
+    function incrementCounter() {
+        console.log('Sending increment request...');
+        stompClient.send('/app/increment', {}, '');
+    }
+
+</script>
+</body>
+</html>
